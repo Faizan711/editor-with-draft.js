@@ -19,7 +19,28 @@ const EditorComponent = () => {
     //This is the function where we will put the checks for different formatting of text
     const handleEditorChange = (newEditorState) => {
         setEditorState(newEditorState);
+        
+        // Get the current line of text
+        const contentState = newEditorState.getCurrentContent();
+        const selectionState = newEditorState.getSelection();
+        const currentBlockKey = selectionState.getStartKey();
+        const currentBlock = contentState.getBlockForKey(currentBlockKey);
+        const currentText = currentBlock.getText();
+        // console.log(currentText);
       
+        // Check for heading format
+        if (currentText.startsWith('# ')) {
+          const headingText = currentText.substring(2);
+          const updatedBlock = currentBlock.merge({
+            text: headingText,
+            type: 'header-one'
+          });
+          const newContentState = contentState.merge({
+            blockMap: contentState.getBlockMap().set(currentBlockKey, updatedBlock)
+          });
+          const newEditorStateWithHeading = EditorState.push(newEditorState, newContentState, 'change-block-data');
+          setEditorState(newEditorStateWithHeading);
+        }
 
       };
 
