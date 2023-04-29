@@ -82,6 +82,22 @@ const EditorComponent = () => {
             setEditorState(EditorState.push(editorState, newContentState, 'apply-entity'));
           }
 
+          //check for underline formatting
+          else if (currentText.startsWith('*** ')) {
+            // remove the '***' from the sentence
+            const newText = currentText.substring(4);
+  
+            // create a new content block with the updated text and apply underline style
+            const newContentState = Modifier.replaceText(
+              editorState.getCurrentContent(),
+              editorState.getSelection(),
+              newText,
+              editorState.getCurrentInlineStyle().merge(['UNDERLINE']),
+            );
+  
+            // update editor state
+            setEditorState(EditorState.push(editorState, newContentState, 'apply-entity'));
+          }
       };
 
       // below is the function which stores the text into localStorage of browser.
