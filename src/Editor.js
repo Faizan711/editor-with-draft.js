@@ -41,6 +41,21 @@ const EditorComponent = () => {
           const newEditorStateWithHeading = EditorState.push(newEditorState, newContentState, 'change-block-data');
           setEditorState(newEditorStateWithHeading);
         }
+        else if (currentText.startsWith('* ')) {
+            // remove the '*' from the sentence, this is not working properly due to some issue
+            const newText = currentText.substring(2);
+  
+            // create a new content block with the updated text and apply bold style
+            const newContentState = Modifier.replaceText(
+              editorState.getCurrentContent(),
+              editorState.getSelection(),
+              newText,
+              editorState.getCurrentInlineStyle().merge(['BOLD']),
+            );
+  
+            // update editor state
+            setEditorState(EditorState.push(editorState, newContentState, 'apply-entity'));
+          }
 
       };
 
