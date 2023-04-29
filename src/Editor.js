@@ -5,6 +5,12 @@ import './Editor.css'
 const EditorComponent = () => {
     const [editorState, setEditorState] = useState(EditorState.createEmpty());
 
+    //custom style for redline as draft.js does not provide any for this.
+    const styleMap = {
+        'REDLINE': {
+          color: 'red',
+        },
+      };
   
     useEffect(() => {
       // Load the saved content from localStorage on component mount
@@ -41,6 +47,8 @@ const EditorComponent = () => {
           const newEditorStateWithHeading = EditorState.push(newEditorState, newContentState, 'change-block-data');
           setEditorState(newEditorStateWithHeading);
         }
+
+        //check for bold formatting
         else if (currentText.startsWith('* ')) {
             // remove the '*' from the sentence, this is not working properly due to some issue
             const newText = currentText.substring(2);
@@ -51,6 +59,23 @@ const EditorComponent = () => {
               editorState.getSelection(),
               newText,
               editorState.getCurrentInlineStyle().merge(['BOLD']),
+            );
+  
+            // update editor state
+            setEditorState(EditorState.push(editorState, newContentState, 'apply-entity'));
+          }
+
+          //check for redline formatting
+          else if (currentText.startsWith('** ')) {
+            // remove the '**' from the sentence, this is not working properly due to some issue
+            const newText = currentText.substring(3);
+  
+            // create a new content block with the updated text and apply red line style
+            const newContentState = Modifier.replaceText(
+              editorState.getCurrentContent(),
+              editorState.getSelection(),
+              newText,
+              editorState.getCurrentInlineStyle().merge(['REDLINE']),
             );
   
             // update editor state
@@ -73,7 +98,7 @@ const EditorComponent = () => {
             <button className='btn' onClick={handleSave}>SAVE</button>
         </div>
         <div className='editor'>
-            <Editor editorState={editorState} onChange={handleEditorChange}/>
+            <Editor editorState={editorState} onChange={handleEditorChange} customStyleMap={styleMap}/>
         </div>
       </div>
     );
